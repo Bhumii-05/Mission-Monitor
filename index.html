@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Monitor - Task Management App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2>Mission Monitor</h2>
+            <p>Initializing your productivity dashboard...</p>
+        </div>
+    </div>
+
+    <!-- Authentication Section -->
+    <div id="authSection" class="auth-section">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1><i class="fas fa-rocket"></i> Mission Monitor</h1>
+                <p>Your Personal Task Management System</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form active">
+                <h2>Welcome Back</h2>
+                <form id="loginFormElement">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="loginUsername" placeholder="Username" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Password" required>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('loginPassword')">
+                            <i class="fas fa-eye"
+                            ></i>
+                        </button>
+                    </div>
+                    <button type="submit" class="auth-btn">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </form>
+                <p class="auth-switch">
+                    New to Mission Monitor? 
+                    <a href="#" onclick="showSignupForm()">Create Account</a>
+                </p>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signupForm" class="auth-form">
+                <h2>Join Mission Monitor</h2>
+                <form id="signupFormElement">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="signupUsername" placeholder="Choose Username" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-user-circle"></i>
+                        <input type="text" id="signupDisplayName" placeholder="Display Name" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signupPassword" placeholder="Create Password" required>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signupPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('confirmPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <button type="submit" class="auth-btn">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </form>
+                <p class="auth-switch">
+                    Already have an account? 
+                    <a href="#" onclick="showLoginForm()">Sign In</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="main-app" style="display: none;">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1><i class="fas fa-rocket"></i> Mission Monitor</h1>
+                    <span class="user-greeting">Welcome, <span id="currentUser">User</span>!</span>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle" onclick="toggleTheme()">
+                        <i class="fas fa-moon" onclick="toggleTheme()"></i>
+                    </button>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Motivational Quote -->
+        <div id="motivationalQuote" class="motivational-quote">
+            <div class="quote-content">
+                <i class="fas fa-quote-left"></i>
+                <p id="quoteText">Loading inspiration...</p>
+                <span id="quoteAuthor">- Mission Monitor</span>
+            </div>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalTasks">0</h3>
+                    <p>Total Tasks</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="completedTasks">0</h3>
+                    <p>Completed</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="pendingTasks">0</h3>
+                    <p>Pending</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalBadges">0</h3>
+                    <p>Badges</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <canvas id="progressChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="priorityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Task Controls -->
+        <div class="task-controls">
+            <button class="add-task-btn" onclick="showAddTaskModal()">
+                <i class="fas fa-plus"></i> Add New Task
+            </button>
+            <div class="filter-controls">
+                <select id="priorityFilter" onchange="filterTasks()">
+                    <option value="all">All Priorities</option>
+                    <option value="high">High Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="low">Low Priority</option>
+                </select>
+                <select id="statusFilter" onchange="filterTasks()">
+                    <option value="all">All Tasks</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tasks Container -->
+        <div class="tasks-container">
+            <div class="tasks-header">
+                <h2><i class="fas fa-calendar-alt"></i> Your Tasks</h2>
+                <p class="tasks-subtitle">15-day rolling window (7 days back, 7 days forward)</p>
+            </div>
+            <div id="tasksContainer" class="tasks-grid">
+                <!-- Tasks will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Badges Section -->
+        <div class="badges-section">
+            <div class="section-header">
+                <h2><i class="fas fa-trophy"></i> Achievement Badges</h2>
+                <p>Complete tasks to unlock achievements and build your streak!</p>
+            </div>
+            <div id="badgesContainer" class="badges-grid">
+                <!-- Badges will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="addTaskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Add New Task</h2>
+                <button class="close-btn" onclick="closeAddTaskModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addTaskForm">
+                <div class="form-group">
+                    <label for="taskTitle">Task Title</label>
+                    <input type="text" id="taskTitle" placeholder="Enter task title" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskDescription">Description</label>
+                    <textarea id="taskDescription" placeholder="Enter task description" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskPriority">Priority</label>
+                        <select id="taskPriority" required>
+                            <option value="high">🔴 High Priority</option>
+                            <option value="medium" selected>🟡 Medium Priority</option>
+                            <option value="low">🟢 Low Priority</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDate">Date</label>
+                        <input type="date" id="taskDate" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskStartTime">Start Time</label>
+                        <input type="time" id="taskStartTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskEndTime">End Time</label>
+                        <input type="time" id="taskEndTime" required>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" onclick="closeAddTaskModal()">Cancel</button>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-save"></i> Add Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Task Modal -->
+    <div id="editTaskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Edit Task</h2>
+                <button class="close-btn" onclick="closeEditTaskModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editTaskForm">
+                <input type="hidden" id="editTaskId">
+                <div class="form-group">
+                    <label for="editTaskTitle">Task Title</label>
+                    <input type="text" id="editTaskTitle" placeholder="Enter task title" required>
+                </div>
+                <div class="form-group">
+                    <label for="editTaskDescription">Description</label>
+                    <textarea id="editTaskDescription" placeholder="Enter task description" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editTaskPriority">Priority</label>
+                        <select id="editTaskPriority" required>
+                            <option value="high">🔴 High Priority</option>
+                            <option value="medium">🟡 Medium Priority</option>
+                            <option value="low">🟢 Low Priority</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTaskDate">Date</label>
+                        <input type="date" id="editTaskDate" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editTaskStartTime">Start Time</label>
+                        <input type="time" id="editTaskStartTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTaskEndTime">End Time</label>
+                        <input type="time" id="editTaskEndTime" required>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" onclick="closeEditTaskModal()">Cancel</button>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-save"></i> Update Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
